@@ -16,7 +16,7 @@ jobs:
         id: decide
         run: |
           # 15% de chance d'exécuter
-          if [ $(( RANDOM % 100 )) -lt 100 ]; then
+          if [ $(( RANDOM % 100 )) -lt 15 ]; then
             echo "run=true" >> $GITHUB_OUTPUT
             echo "✅ Run (15% chance)"
           else
@@ -41,7 +41,7 @@ jobs:
           git config user.name "Z3nyx"
           git config user.email "243652453+Z3nyx@users.noreply.github.com"
           git add last-update.txt
-          git commit -m "Update last-update timestamp [skip ci]" || echo "No changes to commit"
+          git commit -m "Update last-update.txt" || echo "No changes to commit"
           git push origin HEAD:main
         env:
           GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_TOKEN }}
