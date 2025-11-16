@@ -1,0 +1,47 @@
+name: Update Timestamp
+
+on:
+  schedule:
+    - cron: "*/5 * * * *" # toutes les 5 minutes
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update_timestamp:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide if run
+        id: decide
+        run: |
+          # 15% de chance d'exécuter
+          if [ $(( RANDOM % 100 )) -lt 100 ]; then
+            echo "run=true" >> $GITHUB_OUTPUT
+            echo "✅ Run (15% chance)"
+          else
+            echo "run=false" >> $GITHUB_OUTPUT
+            echo "❌ Skip (85% chance)"
+          fi
+
+      - name: Checkout repo
+        if: steps.decide.outputs.run == 'true'
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.MY_PERSONAL_TOKEN }}
+
+      - name: Update timestamp
+        if: steps.decide.outputs.run == 'true'
+        run: |
+          echo "$(date -u +'%Y-%m-%d %H:%M:%S UTC')" > last-update.txt
+
+      - name: Commit and push
+        if: steps.decide.outputs.run == 'true'
+        run: |
+          git config user.name "Z3nyx"
+          git config user.email "243652453+Z3nyx@users.noreply.github.com"
+          git add last-update.txt
+          git commit -m "Update last-update.txt" || echo "No changes to commit"
+          git push origin HEAD:main
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_TOKEN }}
